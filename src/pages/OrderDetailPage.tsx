@@ -57,12 +57,12 @@ export default function OrderDetailPage() {
               {order.items.map((item) => (
                 <div key={item.id} className="flex justify-between items-center border-b pb-4">
                   <div>
-                    <p className="font-medium">{item.productName}</p>
+                    <p className="font-medium">{item.bookTitle || item.stickerTitle || 'Unknown Product'}</p>
                     <p className="text-sm text-gray-500">
-                      {item.productType} × {item.quantity}
+                      {item.bookId ? 'Book' : item.stickerId ? 'Sticker' : 'Product'} × {item.quantity}
                     </p>
                   </div>
-                  <p className="font-medium">${item.total.toFixed(2)}</p>
+                  <p className="font-medium">${item.subtotal.toFixed(2)}</p>
                 </div>
               ))}
             </div>
@@ -71,8 +71,8 @@ export default function OrderDetailPage() {
           <div className="bg-white rounded-lg shadow p-6">
             <h2 className="text-xl font-semibold mb-4">Shipping Address</h2>
             <div className="text-gray-600">
-              <p className="font-medium">{order.shippingAddress.name}</p>
-              <p>{order.shippingAddress.street}</p>
+              <p className="font-medium">{order.shippingAddress.fullName}</p>
+              <p>{order.shippingAddress.streetAddress}</p>
               <p>
                 {order.shippingAddress.city}, {order.shippingAddress.state}{' '}
                 {order.shippingAddress.postalCode}

@@ -1,26 +1,12 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { adminUserApi, type AdminUser as ApiAdminUser, type CreateAdminUserRequest } from '@lib/api/adminUsers';
+import { adminUserApi, type AdminUser, type CreateAdminUserRequest } from '@lib/api/adminUsers';
 import { type AdminRole, roleDetails, getRoleBadgeColor } from '@lib/permissions';
-
-// Map API response to component interface
-interface AdminUser {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  role: AdminRole;
-  isActive: boolean;
-  lastLogin: string;
-  createdAt: string;
-}
 
 export default function AdminUsersPage() {
   const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   // Form state for new admin user
   const [newAdmin, setNewAdmin] = useState<CreateAdminUserRequest>({
@@ -238,23 +224,14 @@ export default function AdminUsersPage() {
                   </button>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                  {new Date(user.lastLogin).toLocaleDateString('en-US', { 
+                  {user.lastLogin ? new Date(user.lastLogin).toLocaleDateString('en-US', { 
                     month: 'short', 
                     day: 'numeric',
                     hour: '2-digit',
                     minute: '2-digit'
-                  })}
+                  }) : 'Never'}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <button
-                    onClick={() => {
-                      setSelectedUser(user);
-                      setIsEditModalOpen(true);
-                    }}
-                    className="text-indigo-600 hover:text-indigo-900 mr-4 font-semibold transition-colors"
-                  >
-                    Edit
-                  </button>
                   <button
                     onClick={() => handleDeleteAdmin(user)}
                     disabled={user.role === 'owner'}

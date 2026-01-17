@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { bookApi } from '@lib/api/books';
-import type { CreateBookRequest, BookDetailResponse } from '@lib/api/books';
+import type { CreateBookRequest } from '@lib/api/books';
 
 interface BookEditModalProps {
   bookId: string;

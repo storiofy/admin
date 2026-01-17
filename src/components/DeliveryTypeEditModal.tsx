@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { deliveryTypeApi } from '@lib/api/deliveryTypes';
-import type { CreateDeliveryTypeRequest, DeliveryType } from '@lib/api/deliveryTypes';
+import type { CreateDeliveryTypeRequest } from '@lib/api/deliveryTypes';
 
 interface DeliveryTypeEditModalProps {
   deliveryTypeId: string;
