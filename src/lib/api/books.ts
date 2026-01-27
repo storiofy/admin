@@ -14,6 +14,7 @@ export interface BookListItem {
   basePrice: number;
   discountPercentage?: number;
   finalPrice: number;
+  currencyPrices?: Record<string, number>;
   isFeatured?: boolean;
   isBestseller?: boolean;
 }
@@ -44,14 +45,15 @@ export interface CreateBookRequest {
   ageMin: number;
   ageMax: number;
   pageCount: number;
-  basePrice: number;
+  basePrice?: number;
+  currencyPrices: Record<string, number>;
   discountPercentage?: number;
   isFeatured?: boolean;
   isBestseller?: boolean;
   displayOrder?: number;
 }
 
-export interface CreateBookWithFilesRequest extends CreateBookRequest {
+export interface CreateBookWithFilesRequest extends Omit<CreateBookRequest, 'coverImage' | 'additionalImages' | 'videos'> {
   coverImage?: File;
   additionalImages?: File[];
   videos?: File[];
@@ -85,37 +87,37 @@ export const bookApi = {
   create: async (data: CreateBookRequest | CreateBookWithFilesRequest): Promise<BookDetailResponse> => {
     // Check if this request includes files
     const withFiles = data as CreateBookWithFilesRequest;
-    const hasFiles = withFiles.coverImage || 
-                     (withFiles.additionalImages && withFiles.additionalImages.length > 0) ||
-                     (withFiles.videos && withFiles.videos.length > 0);
+    const hasFiles = withFiles.coverImage ||
+      (withFiles.additionalImages && withFiles.additionalImages.length > 0) ||
+      (withFiles.videos && withFiles.videos.length > 0);
 
     if (hasFiles) {
       // Send as multipart/form-data with files
       const formData = new FormData();
-      
+
       // Add book data as JSON string
       const { coverImage, additionalImages, videos, ...bookData } = withFiles;
       formData.append('book', JSON.stringify(bookData));
-      
+
       // Add cover image if provided
       if (coverImage) {
         formData.append('coverImage', coverImage);
       }
-      
+
       // Add additional images if provided
       if (additionalImages && additionalImages.length > 0) {
         additionalImages.forEach((image) => {
           formData.append('additionalImages', image);
         });
       }
-      
+
       // Add videos if provided
       if (videos && videos.length > 0) {
         videos.forEach((video) => {
           formData.append('videos', video);
         });
       }
-      
+
       const response = await apiClient.post('/admin/books', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',

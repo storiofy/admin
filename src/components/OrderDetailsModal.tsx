@@ -23,6 +23,13 @@ export default function OrderDetailsModal({ order, onClose }: OrderDetailsModalP
   const [trackingNumber, setTrackingNumber] = useState(order.trackingNumber || '');
   const [notes, setNotes] = useState(order.notes || '');
 
+  const formatPrice = (amount: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: order.currencyCode || 'USD',
+    }).format(amount);
+  };
+
   const updateStatusMutation = useMutation({
     mutationFn: (data: { status: OrderStatus; trackingNumber?: string; notes?: string }) =>
       orderApi.updateStatus(order.orderNumber, data),
@@ -170,8 +177,8 @@ export default function OrderDetailsModal({ order, onClose }: OrderDetailsModalP
                                 </div>
                               </div>
                               <div className="text-right">
-                                <p className="font-bold text-gray-900 text-lg">${item.subtotal.toFixed(2)}</p>
-                                <p className="text-sm text-gray-500">${item.unitPrice.toFixed(2)} each</p>
+                                <p className="font-bold text-gray-900 text-lg">{formatPrice(item.subtotal)}</p>
+                                <p className="text-sm text-gray-500">{formatPrice(item.unitPrice)} each</p>
                               </div>
                             </div>
 
@@ -216,12 +223,11 @@ export default function OrderDetailsModal({ order, onClose }: OrderDetailsModalP
                                       </div>
                                       <div>
                                         <span className="text-gray-600 font-medium">Status:</span>
-                                        <span className={`inline-block px-2 py-1 text-xs font-semibold rounded capitalize ${
-                                          item.personalization.status === 'completed' ? 'bg-green-100 text-green-700' :
+                                        <span className={`inline-block px-2 py-1 text-xs font-semibold rounded capitalize ${item.personalization.status === 'completed' ? 'bg-green-100 text-green-700' :
                                           item.personalization.status === 'generating' ? 'bg-blue-100 text-blue-700' :
-                                          item.personalization.status === 'approved' ? 'bg-purple-100 text-purple-700' :
-                                          'bg-gray-100 text-gray-700'
-                                        }`}>
+                                            item.personalization.status === 'approved' ? 'bg-purple-100 text-purple-700' :
+                                              'bg-gray-100 text-gray-700'
+                                          }`}>
                                           {item.personalization.status}
                                         </span>
                                       </div>
@@ -338,7 +344,7 @@ export default function OrderDetailsModal({ order, onClose }: OrderDetailsModalP
                 {/* Order Status */}
                 <div className="bg-white rounded-xl border border-gray-200 p-6">
                   <h4 className="text-lg font-semibold text-gray-900 mb-4">Order Status</h4>
-                  
+
                   {!isEditMode ? (
                     <div>
                       <div className="mb-4">
@@ -443,7 +449,7 @@ export default function OrderDetailsModal({ order, onClose }: OrderDetailsModalP
                       <div className="grid grid-cols-2 gap-4">
                         <div>
                           <p className="text-sm font-medium text-gray-600">Price</p>
-                          <p className="text-base font-semibold text-gray-900">${order.deliveryType.price.toFixed(2)}</p>
+                          <p className="text-base font-semibold text-gray-900">{formatPrice(order.deliveryType.price)}</p>
                         </div>
                         {order.deliveryType.estimatedDays && (
                           <div>
@@ -462,25 +468,25 @@ export default function OrderDetailsModal({ order, onClose }: OrderDetailsModalP
                   <div className="space-y-3">
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Subtotal:</span>
-                      <span className="font-medium text-gray-900">${order.subtotal.toFixed(2)}</span>
+                      <span className="font-medium text-gray-900">{formatPrice(order.subtotal)}</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Shipping ({order.shippingMethod}):</span>
-                      <span className="font-medium text-gray-900">${order.shippingCost.toFixed(2)}</span>
+                      <span className="font-medium text-gray-900">{formatPrice(order.shippingCost)}</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Tax:</span>
-                      <span className="font-medium text-gray-900">${order.tax.toFixed(2)}</span>
+                      <span className="font-medium text-gray-900">{formatPrice(order.tax)}</span>
                     </div>
                     {order.discount > 0 && (
                       <div className="flex justify-between text-sm text-green-600">
                         <span>Discount:</span>
-                        <span className="font-medium">-${order.discount.toFixed(2)}</span>
+                        <span className="font-medium">-{formatPrice(order.discount)}</span>
                       </div>
                     )}
                     <div className="flex justify-between font-bold text-lg border-t border-indigo-200 pt-3">
                       <span className="text-gray-900">Total:</span>
-                      <span className="text-indigo-600">${order.total.toFixed(2)} {order.currencyCode}</span>
+                      <span className="text-indigo-600">{formatPrice(order.total)}</span>
                     </div>
                   </div>
                 </div>
@@ -491,11 +497,10 @@ export default function OrderDetailsModal({ order, onClose }: OrderDetailsModalP
                   <div className="space-y-3 text-sm">
                     <div className="flex justify-between">
                       <span className="text-gray-600">Status:</span>
-                      <span className={`font-semibold ${
-                        order.paymentStatus === 'paid' ? 'text-green-600' : 
-                        order.paymentStatus === 'failed' ? 'text-red-600' : 
-                        'text-yellow-600'
-                      }`}>
+                      <span className={`font-semibold ${order.paymentStatus === 'paid' ? 'text-green-600' :
+                        order.paymentStatus === 'failed' ? 'text-red-600' :
+                          'text-yellow-600'
+                        }`}>
                         {order.paymentStatus?.toUpperCase()}
                       </span>
                     </div>

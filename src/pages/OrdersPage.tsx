@@ -127,32 +127,30 @@ export default function OrdersPage() {
                   </button>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                  {new Date(order.createdAt).toLocaleDateString('en-US', { 
-                    month: 'short', 
-                    day: 'numeric', 
-                    year: 'numeric' 
+                  {new Date(order.createdAt).toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric'
                   })}
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-600">
                   <span className="font-medium">{order.items.length}</span> item(s)
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">
-                  ${order.total.toFixed(2)}
+                  {new Intl.NumberFormat('en-US', { style: 'currency', currency: order.currencyCode || 'USD' }).format(order.total)}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span
-                    className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                      statusColors[order.status] || 'bg-gray-100 text-gray-800'
-                    }`}
+                    className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${statusColors[order.status] || 'bg-gray-100 text-gray-800'
+                      }`}
                   >
                     {order.status}
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span
-                    className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                      paymentStatusColors[order.paymentStatus] || 'bg-gray-100 text-gray-800'
-                    }`}
+                    className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${paymentStatusColors[order.paymentStatus] || 'bg-gray-100 text-gray-800'
+                      }`}
                   >
                     {order.paymentStatus}
                   </span>
@@ -196,13 +194,15 @@ export default function OrdersPage() {
       </div>
 
       {/* Order Details Modal */}
-      {selectedOrder && (
-        <OrderDetailsModal
-          order={selectedOrder}
-          onClose={() => setSelectedOrder(null)}
-        />
-      )}
-    </div>
+      {
+        selectedOrder && (
+          <OrderDetailsModal
+            order={selectedOrder}
+            onClose={() => setSelectedOrder(null)}
+          />
+        )
+      }
+    </div >
   );
 }
 

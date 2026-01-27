@@ -73,16 +73,44 @@ export default function BookViewModal({ book, isOpen, onClose }: BookViewModalPr
                   <p className="mt-1 text-sm text-gray-900">{book.ageMin} - {book.ageMax} years</p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Base Price</label>
-                  <p className="mt-1 text-sm text-gray-900">${book.basePrice.toFixed(2)}</p>
+                  <label className="block text-sm font-medium text-gray-700">Prices</label>
+                  <div className="mt-1 space-y-1">
+                    {book.currencyPrices ? (
+                      Object.entries(book.currencyPrices).map(([currency, price]) => {
+                        const discount = book.discountPercentage || 0;
+                        const final = price * (1 - discount / 100);
+                        return (
+                          <div key={currency} className="text-sm text-gray-900">
+                            <span className="font-medium">{currency}:</span>{' '}
+                            <span className={discount > 0 ? 'line-through text-gray-500' : ''}>
+                              {new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(price)}
+                            </span>
+                            {discount > 0 && (
+                              <span className="ml-2 font-semibold">
+                                {new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(final)}
+                              </span>
+                            )}
+                          </div>
+                        );
+                      })
+                    ) : (
+                      // Fallback for old data
+                      <div className="text-sm text-gray-900">
+                        <span className={book.discountPercentage ? 'line-through text-gray-500' : ''}>
+                          ${book.basePrice?.toFixed(2)}
+                        </span>
+                        {book.discountPercentage && (
+                          <span className="ml-2 font-semibold">
+                            ${book.finalPrice?.toFixed(2)}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700">Discount</label>
                   <p className="mt-1 text-sm text-gray-900">{book.discountPercentage || 0}%</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Final Price</label>
-                  <p className="mt-1 text-sm text-gray-900 font-semibold">${book.finalPrice.toFixed(2)}</p>
                 </div>
               </div>
 

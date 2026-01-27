@@ -28,6 +28,11 @@ export default function BookEditModal({ bookId, isOpen, onClose }: BookEditModal
       ageMin: 0,
       ageMax: 18,
       discountPercentage: 0,
+      currencyPrices: {
+        THB: 0,
+        USD: 0,
+        INR: 0,
+      },
     },
   });
 
@@ -44,7 +49,11 @@ export default function BookEditModal({ bookId, isOpen, onClose }: BookEditModal
         ageMin: book.ageMin,
         ageMax: book.ageMax,
         pageCount: book.pageCount || 0,
-        basePrice: book.basePrice,
+        currencyPrices: book.currencyPrices || {
+          THB: 0,
+          USD: 0,
+          INR: 0,
+        },
         discountPercentage: book.discountPercentage || 0,
         isFeatured: book.isFeatured || false,
         isBestseller: book.isBestseller || false,
@@ -53,8 +62,13 @@ export default function BookEditModal({ bookId, isOpen, onClose }: BookEditModal
   }, [book, reset]);
 
   const discountPercentage = watch('discountPercentage') || 0;
-  const basePrice = watch('basePrice') || 0;
-  const finalPrice = basePrice * (1 - discountPercentage / 100);
+  const prices = watch('currencyPrices') || { THB: 0, USD: 0, INR: 0 };
+
+  const finalPrices = {
+    THB: (prices.THB || 0) * (1 - discountPercentage / 100),
+    USD: (prices.USD || 0) * (1 - discountPercentage / 100),
+    INR: (prices.INR || 0) * (1 - discountPercentage / 100),
+  };
 
   const updateMutation = useMutation({
     mutationFn: (data: Partial<CreateBookRequest>) => bookApi.update(bookId, data),
@@ -231,17 +245,50 @@ export default function BookEditModal({ bookId, isOpen, onClose }: BookEditModal
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Base Price *
+                        Price (THB) *
                       </label>
                       <input
                         type="number"
                         step="0.01"
-                        {...register('basePrice', { required: true, valueAsNumber: true })}
+                        {...register('currencyPrices.THB', { required: true, valueAsNumber: true })}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md"
                       />
+                      <div className="mt-1 text-xs text-gray-500">
+                        Final: ฿{finalPrices.THB.toFixed(2)}
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Price (USD) *
+                      </label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        {...register('currencyPrices.USD', { required: true, valueAsNumber: true })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                      />
+                      <div className="mt-1 text-xs text-gray-500">
+                        Final: ${finalPrices.USD.toFixed(2)}
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Price (INR) *
+                      </label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        {...register('currencyPrices.INR', { required: true, valueAsNumber: true })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                      />
+                      <div className="mt-1 text-xs text-gray-500">
+                        Final: ₹{finalPrices.INR.toFixed(2)}
+                      </div>
                     </div>
 
                     <div>
@@ -252,18 +299,6 @@ export default function BookEditModal({ bookId, isOpen, onClose }: BookEditModal
                         type="number"
                         {...register('discountPercentage', { valueAsNumber: true })}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Final Price
-                      </label>
-                      <input
-                        type="text"
-                        value={`$${finalPrice.toFixed(2)}`}
-                        disabled
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100"
                       />
                     </div>
                   </div>
